@@ -19,7 +19,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/tasks" element={<Tasks />} />
-            <Route path="/Tasks" element={<Tasks />} />
+            <Route path="/home" element={<Tasks />} />
             <Route path="/" element={<Login />} />
             <Route path="/tasks/:taskId" element={<TaskDetails />} /> {/* Add TaskDetails route */}
 

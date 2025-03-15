@@ -8,8 +8,6 @@ services:
       - "8080:8080"
     expose:
       - "8080"
-    volumes:
-      - ./Task-Collab-BackEnd/target/app.jar:/app/app.jar
     depends_on:
       - 310-sqlserver
   310-sqlserver:

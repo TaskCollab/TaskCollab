@@ -15,9 +15,9 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <Header />
         <ToastContainer />
         <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <Header />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/tasks" element={<Tasks />} />

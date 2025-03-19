@@ -21,32 +21,32 @@ public class UserControllerService {
         this.userService = userService;
     }
 
-    // ✅ Get user by ID
+    // Get user by ID
     public Users getUserById(Long id) {
         return userService.getUserById(id);
     }
 
-    // ✅ Get all users
+    // Get all users
     public List<Users> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    // ✅ Create a new user
+    // Create a new user
     public Users createUser(Users user) {
         return userService.createUser(user);
     }
 
-    // ✅ Update user details
+    // Update user details
     public Users updateUser(Long id, Users updatedUser) {
         return userService.updateUser(id, updatedUser);
     }
 
-    // ✅ Delete user
+    // Delete user
     public boolean deleteUser(Long id) {
         return userService.deleteUser(id);
     }
 
-    // ✅ Assign Role to a user
+    // Assign Role to a user
     public Users updateUserRole(Long userId, Role newRole) {
         Optional<Users> optionalUser = userRepository.findById(userId);
         Optional<Role> optionalRole = Optional.ofNullable(newRole);

@@ -8,18 +8,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import com.TaskCollab.Security.JwtAuthFilter;
-
-import com.TaskCollab.Service.UserService;
-
+import org.springframework.security.core.userdetails.UserDetailsService;
 import java.util.List;
 
 @Configuration
@@ -27,14 +22,12 @@ import java.util.List;
 @EnableGlobalMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize annotations
 public class SecurityConfig {
 
-    private final UserService userDetailsService;
-    private final JwtUtils jwtUtils;
+    private final UserDetailsService userDetailsService;
     private final JwtAuthFilter jwtAuthFilter;
 
     // ✅ Constructor Injection
-    public SecurityConfig(UserService userDetailsService, JwtUtils jwtUtils, JwtAuthFilter jwtAuthFilter) {
+    public SecurityConfig(UserDetailsService userDetailsService, JwtAuthFilter jwtAuthFilter) {
         this.userDetailsService = userDetailsService;
-        this.jwtUtils = jwtUtils;
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
@@ -42,11 +35,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configure(http)) // This enables CORS
+            .cors(cors -> cors.configure(http)) // Enables CORS
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/delete/**").authenticated()
+                .requestMatchers("/api/users/**").hasRole("ADMIN") // Only Admins can manage users
+                .requestMatchers("/api/tasks/**").authenticated() // Users must be authenticated for tasks
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -54,30 +48,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Secure password hashing
-    }
-
-    // CORS Configuration
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Allow all origins
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-    // Authentication Manager (needed for login endpoint)
-    @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                    .userDetailsService(userDetailsService)
-                   .passwordEncoder(passwordEncoder())
                    .and()
                    .build();
     }

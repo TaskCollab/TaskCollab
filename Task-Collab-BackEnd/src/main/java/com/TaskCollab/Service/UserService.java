@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.TaskCollab.Entity.Role;
@@ -21,37 +19,35 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Service
 public class UserService implements UserDetailsService {
-    
-    @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private RoleRepository roleRepository;
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+
+    // ✅ Constructor Injection (No PasswordEncoder)
+    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) {
         Users user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
 
-        // Combine role name and CRUD permissions
+        // ✅ Role-based permissions
         Set<GrantedAuthority> authorities = new HashSet<>();
-        Set<Role> roles = user.getRole() == null ? new HashSet<>() : new HashSet<>(Set.of(user.getRole()));
-        for (Role role : roles) {  
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName())); 
-        
+        Role role = user.getRole();
+        if (role != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
             if (role.isCreatePermission()) authorities.add(new SimpleGrantedAuthority("CREATE"));
             if (role.isReadPermission()) authorities.add(new SimpleGrantedAuthority("READ"));
             if (role.isUpdatePermission()) authorities.add(new SimpleGrantedAuthority("UPDATE"));
             if (role.isDeletePermission()) authorities.add(new SimpleGrantedAuthority("DELETE"));
         }
-        
 
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
-                user.getPassword(),
+                user.getPassword(), // Passwords stored in plaintext
                 authorities
         );
     }
@@ -71,17 +67,16 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    // ✅ Create a new user
+    // ✅ Create a new user (Stores password directly)
     public Users createUser(Users user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // Hash password
-        return userRepository.save(user);
+        return userRepository.save(user); // ✅ No hashing, storing passwords in plaintext
     }
 
     // ✅ Update user details
     public Users updateUser(Long id, Users updatedUser) {
         return userRepository.findById(id).map(user -> {
             user.setUsername(updatedUser.getUsername());
-            user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+            user.setPassword(updatedUser.getPassword()); // ✅ No encoding, stores plaintext password
             return userRepository.save(user);
         }).orElse(null);
     }

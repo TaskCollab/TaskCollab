@@ -1,6 +1,7 @@
 package com.TaskCollab.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,4 +46,37 @@ public class UserService implements UserDetailsService {
                 authorities
         );
     }
+// Get user by ID
+public Users getUserById(Long id) {
+    return userRepository.findById(id).orElse(null);
+}
+
+// Get all users
+public List<Users> getAllUsers() {
+    return userRepository.findAll();
+}
+
+// Create a new user (Stores raw password)
+public Users createUser(Users user) {
+    return userRepository.save(user); // ✅ No hashing, stores raw password
+}
+
+// Update user details (Stores raw password)
+public Users updateUser(Long id, Users updatedUser) {
+    return userRepository.findById(id).map(user -> {
+        user.setUsername(updatedUser.getUsername());
+        user.setPassword(updatedUser.getPassword()); 
+        return userRepository.save(user);
+    }).orElse(null);
+}
+
+// Delete user
+public boolean deleteUser(Long id) {
+    if (userRepository.existsById(id)) {
+        userRepository.deleteById(id);
+        return true;
+    }
+    return false;
+}
+
 }

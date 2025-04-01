@@ -228,10 +228,6 @@ const ViewTasks: React.FC = () => {
 
           <TasksTable
             tasks={filteredTasks}
-            isAdmin={isAdmin}
-            onUpdateTask={handleUpdateTask}
-            onDeleteTask={handleDeleteTask}
-            onLockTask={handleLockTask}
             navigate={navigate}
           />
         </>

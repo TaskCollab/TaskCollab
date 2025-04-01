@@ -116,6 +116,12 @@ const Header: React.FC = () => {
   return (
     <AppBar position="static">
       <Toolbar>
+
+
+        <Typography variant="h6" sx={{ flexGrow: 0, TextAlign: 'left'}}>
+          <Button color="inherit" onClick={() => navigate('/home')}>Home</Button>
+        </Typography>
+
         <Box sx={{ flexGrow: 1 }} />
 
         <IconButton size="large" color="inherit" onClick={handleNotificationOpen} sx={{ mr: 2 }}>
@@ -124,23 +130,12 @@ const Header: React.FC = () => {
           </Badge>
         </IconButton>
 
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          <Button color="inherit" onClick={() => navigate('/home')}>Home</Button>
-        </Typography>
-
-        <Button color="inherit" onClick={handleOpenCreateDialog}>New Task</Button>
-
         {isAdmin && (
           <Button color="inherit" component={Link} to="/users">Manage Users</Button>
         )}
       </Toolbar>
 
-      <CreateTask
-        open={createDialogOpen}
-        onClose={() => setCreateDialogOpen(false)}
-        onTaskCreated={handleTaskCreated}
-        isAdmin={isAdmin}
-      />
+
 
       <Modal open={isModalOpen} onClose={handleNotificationClose}>
         <Box

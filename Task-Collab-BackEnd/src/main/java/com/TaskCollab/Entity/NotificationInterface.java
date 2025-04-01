@@ -1,6 +1,5 @@
 package com.TaskCollab.Entity;
 
-import java.time.LocalDateTime;
 
 public interface NotificationInterface {
     public Long getNotificationId();

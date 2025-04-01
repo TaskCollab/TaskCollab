@@ -11,23 +11,7 @@ services:
       - "8080"
     volumes:
       - ./target/app.jar:/app/app.jar           
-  
-  310-mysql:
-        image: mysql:8.0
-        container_name: 310-mysql
-        restart: always
-        environment:
-            MYSQL_DATABASE: 'testuser'
-            MYSQL_USER: 'testuser'
-            MYSQL_PASSWORD: '310testpw'            
-            MYSQL_ROOT_PASSWORD: '310rootpw'
-        ports:
-            - '3306:3306'
-        expose:
-            - '3306'   
-        volumes:
-            - mysql-db:/var/lib/mysql
-            - ./ddl:/docker-entrypoint-initdb.d
+
   310-sqlserver:
         image: mcr.microsoft.com/mssql/server:2019-latest
         container_name: 310-sqlserver
@@ -65,7 +49,6 @@ services:
                exit 0
 volumes: 
     310-db:
-    mysql-db:
     db-config:
   
 

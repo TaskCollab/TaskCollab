@@ -9,6 +9,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { Edit, Delete, Lock, LockOpen, Save, Cancel } from '@mui/icons-material';
+import { toast } from 'react-toastify'; // Import toast from react-toastify
 
 interface Task {
   id: string;
@@ -26,6 +27,7 @@ interface TaskRowProps {
   onUpdate: (updatedTask: Task) => void;
   onDelete: (taskId: string) => void;
   onLock: (taskId: string) => void;
+  lockTaskApi: (taskId: string, locked: boolean) => Promise<void>; // Add the lockTaskApi
 }
 
 const TaskRow: React.FC<TaskRowProps> = ({
@@ -34,6 +36,7 @@ const TaskRow: React.FC<TaskRowProps> = ({
   onUpdate,
   onDelete,
   onLock,
+  lockTaskApi, // Receive the api call as a prop
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState<Task>({ ...task });
@@ -51,6 +54,21 @@ const TaskRow: React.FC<TaskRowProps> = ({
     setIsEditing(false);
     setEditedTask({ ...task });
   };
+
+    const handleLock = async () => {
+        if (!isAdmin) {
+            toast.error("You are not authorized to lock tasks.");
+            return;
+        }
+
+        try {
+            await lockTaskApi(task.id, !task.locked); // Call the API
+            onLock(task.id); // Update the state
+        } catch (error) {
+            console.error("Failed to lock/unlock task:", error);
+            toast.error("Failed to lock/unlock task.");
+        }
+    };
 
   return (
     <TableRow>
@@ -137,7 +155,7 @@ const TaskRow: React.FC<TaskRowProps> = ({
               <Delete />
             </IconButton>
             {isAdmin && (
-              <IconButton onClick={() => onLock(task.id)} color="default">
+              <IconButton onClick={handleLock} color="default">
                 {task.locked ? <Lock /> : <LockOpen />}
               </IconButton>
             )}

@@ -12,6 +12,9 @@ import {
 } from '@mui/material';
 import TaskRow from './TaskRow';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'; // Import toast from react-toastify
+import { getTask } from '../../API/TaskDetailsAPI';
+import { TaskAPI } from '../../API/TasksAPICall';
 
 interface Task {
   id: string;
@@ -45,6 +48,28 @@ const TasksTable: React.FC<TasksTableProps> = ({
   const handleTitleClick = (taskId: string) => {
     navigate(`/tasks/${taskId}`);
   };
+
+    const lockTaskApi = async (taskId: number, locked: boolean) => {
+        // Implement your API call here
+        // Example:
+        try{
+          
+            const response = await TaskAPI.lockTask(taskId, locked);
+            if (response.status === 200) {
+                toast.success(`Task ${locked ? 'locked' : 'unlocked'} successfully`);
+            } else {
+                toast.error(`Failed to ${locked ? 'lock' : 'unlock'} task`);
+            }
+
+            if (!response.ok) {
+                throw new Error('Failed to lock/unlock task');
+            }
+        }catch(error){
+            console.error(error);
+            throw error;
+        }
+
+    }
 
   return (
     <TableContainer component={Paper} elevation={3}>
@@ -90,6 +115,17 @@ const TasksTable: React.FC<TasksTableProps> = ({
                     onUpdate={onUpdateTask}
                     onDelete={onDeleteTask}
                     onLock={onLockTask}
+                    lockTaskApi={async (taskId: string, locked: boolean) => {
+                      // Call the lockTaskApi function here
+                      try {
+                        await lockTaskApi(parseInt(taskId), locked);
+                        onLockTask(taskId); // Update the state
+                      } catch (error) {
+                        console.error('Failed to lock/unlock task:', error);
+                        toast.error('Failed to lock/unlock task.');
+                      }
+                      console.log(`Task ${taskId} locked: ${locked}`);
+                    }} // Pass the API call
                   />
                 </TableCell>
               </TableRow>

@@ -15,4 +15,6 @@ public interface TaskInterface {
     void setStatus(String status);
     LocalDateTime getDeadline();
     void setDeadline(LocalDateTime deadline);
+    String getPriority();
+    void setPriority(String priority);
 }

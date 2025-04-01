@@ -42,6 +42,7 @@ public class TaskService {
         task.setAssigned_To(taskDTO.getAssignedTo());
         task.setStatus(taskDTO.getStatus());
         task.setDeadline(taskDTO.getDeadline());
+        task.setPriority(taskDTO.getPriority());
 
         Task savedTask = taskRepository.save(task);
 
@@ -64,6 +65,7 @@ public TaskInterface updateTask(Long taskId, TaskDTO taskDTO) {
         existingTask.setAssigned_To(taskDTO.getAssignedTo());
         existingTask.setStatus(taskDTO.getStatus());
         existingTask.setDeadline(taskDTO.getDeadline());
+        existingTask.setPriority(taskDTO.getPriority());
 
         Task updatedTask = taskRepository.save(existingTask);
 

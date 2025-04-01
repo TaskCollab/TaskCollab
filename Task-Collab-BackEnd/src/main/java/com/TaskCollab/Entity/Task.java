@@ -31,6 +31,17 @@ public class Task implements TaskInterface {
     private String status;
     private LocalDateTime deadline;
 
+    @Column(name = "priority")
+    private String priority;
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
 
     public String getTask_Title() {
         return task_Title;

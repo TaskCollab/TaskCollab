@@ -47,6 +47,7 @@ CREATE TABLE Task (
    task_Id BIGINT IDENTITY(1000,1) NOT NULL PRIMARY KEY,
    task_Title NVARCHAR(255) NOT NULL,
    description NVARCHAR(MAX),
+   priority INT NOT NULL DEFAULT 1,
    assigned_To NVARCHAR(255) NULL,
    status NVARCHAR(50),
    deadline DATETIME,

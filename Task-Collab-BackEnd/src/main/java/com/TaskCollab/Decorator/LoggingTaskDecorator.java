@@ -19,5 +19,18 @@ public class LoggingTaskDecorator extends TaskDecorator {
         System.out.println("Logging: Setting status to " + status);
         super.setStatus(status);
     }
-    
+
+    @Override
+    public String getPriority() {
+        // Implement logging logic here, or delegate.
+        System.out.println("Logging: Getting priority.");
+        return super.getPriority();
+    }
+
+    @Override
+    public void setPriority(String priority) {
+        // Implement logging logic here, or delegate.
+        System.out.println("Logging: Setting priority to " + priority);
+        super.setPriority(priority);
+    }
 }

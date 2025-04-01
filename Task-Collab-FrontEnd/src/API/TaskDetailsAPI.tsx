@@ -9,7 +9,7 @@ export const getTask = async (Id: number) => {
     try {
       const url = `${TASK_API_URL}${Id}`; // Correct URL construction
       console.log("Constructed URL:", url); // Debug log
-      const response = await axios.post(url, {}, {
+      const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

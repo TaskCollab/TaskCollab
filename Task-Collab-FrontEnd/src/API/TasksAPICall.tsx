@@ -8,6 +8,16 @@ const taskApiClient = axios.create({
   }
 });
 
+type TaskSearchCriteria = {
+  taskTitle?: string;
+  description?: string;
+  assignedTo?: number | string; // Adjust type based on backend expectation (ID or name?)
+  status?: 'Open' | 'In Progress' | 'Completed';
+  deadline?: string; // Format like 'YYYY-MM-DD' if sending just date
+};
+
+
+
 const handleApiError = (error: unknown) => {
   if (axios.isAxiosError(error)) {
     console.error('API Error:', error.response?.data?.message || error.message);
@@ -29,6 +39,43 @@ export const TaskAPI = {
   getUserTasks: async () => {
     const response = await taskApiClient.get("/my-tasks");
     return response.data;
+  },
+
+   async searchTasks(criteria: TaskSearchCriteria): Promise<any[]> { //TODO: FIX THIS API CALL
+    // Ensure deadline is formatted correctly if provided, or omit if null/undefined
+    const body: any = {};
+    if (criteria.taskTitle) body.taskTitle = criteria.taskTitle;
+    if (criteria.description) body.description = criteria.description;
+    if (criteria.assignedTo) body.assignedTo = criteria.assignedTo;
+    if (criteria.status) body.status = criteria.status;
+    // Backend expects deadline as string? Adjust formatting as needed.
+    // If you send just 'YYYY-MM-DD', ensure backend handles it or send full ISO string.
+    if (criteria.deadline) body.deadline = `${criteria.deadline}T00:00:00`; // Example formatting
+
+    try {
+      const response = await fetch(`${TASK_API_URL}search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add other necessary headers like Authorization if required
+          // 'Authorization': `Bearer ${your_token}`
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        // Throw an error with more context if possible
+        const errorData = await response.text(); // Or response.json() if backend sends structured error
+        console.error("Search API Error Response:", errorData);
+        throw new Error(`HTTP error! status: ${response.status} - ${errorData}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to search tasks:", error);
+      // Re-throw the error so the component can catch it
+      throw error;
+    }
   },
 
   createTask: async (taskData: TaskDTO) => {

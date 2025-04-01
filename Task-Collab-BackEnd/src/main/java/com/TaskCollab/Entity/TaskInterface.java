@@ -17,4 +17,6 @@ public interface TaskInterface {
     void setDeadline(LocalDateTime deadline);
     String getPriority();
     void setPriority(String priority);
+    boolean isLocked();
+    void setLocked(boolean locked);
 }

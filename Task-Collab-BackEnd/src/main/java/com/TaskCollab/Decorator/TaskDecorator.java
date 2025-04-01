@@ -79,4 +79,14 @@ public abstract class TaskDecorator implements TaskInterface {
     public void setDeadline(LocalDateTime deadline) {
         decoratedTask.setDeadline(deadline);
     }
+
+    @Override
+    public boolean isLocked() {
+        return decoratedTask.isLocked();
+    }
+
+    @Override
+    public void setLocked(boolean locked) {
+        decoratedTask.setLocked(locked);
+    }
 }

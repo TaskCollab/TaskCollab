@@ -131,7 +131,7 @@ const Header: React.FC = () => {
         <Button color="inherit" onClick={handleOpenCreateDialog}>New Task</Button>
 
         {isAdmin && (
-          <Button color="inherit" component={Link} to="/manage-users">Manage Users</Button>
+          <Button color="inherit" component={Link} to="/users">Manage Users</Button>
         )}
       </Toolbar>
 

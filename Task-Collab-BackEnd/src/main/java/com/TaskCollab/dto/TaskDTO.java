@@ -11,4 +11,5 @@ public class TaskDTO {
     private String status;
     private LocalDateTime deadline;
     private String priority;
+    private boolean locked;
 }

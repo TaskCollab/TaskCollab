@@ -4,6 +4,7 @@ import { Box, Typography, TextField, Button, Select, MenuItem, FormControl, Inpu
 import { TaskAPI } from '../../API/TasksAPICall';
 import { getTask, updateTask, deleteTask } from '../../API/TaskDetailsAPI'; // Adjust the path
 import { Description } from '@mui/icons-material';
+import { toast } from 'react-toastify'; // Import toast
 
 type Task = {
   id: string;
@@ -12,7 +13,8 @@ type Task = {
   deadline: string;
   priority: 'High' | 'Medium' | 'Low';
   status: 'Open' | 'In Progress' | 'Completed';
-  description: string; // Added description
+  description: string;
+  locked: boolean;
 };
 
 const TaskDetails: React.FC = () => {
@@ -36,7 +38,8 @@ const TaskDetails: React.FC = () => {
             deadline: data.deadline ? data.deadline.split('T')[0] : "No Due Date",
             priority: data.priority as 'High' | 'Medium' | 'Low',
             status: data.status as 'Open' | 'In Progress' | 'Completed',
-            description: data.description || "", // Added description
+            description: data.description || "",
+            locked: data.locked || false,
           };
           setTask(formattedTask);
           setEditedTask(formattedTask);
@@ -78,7 +81,8 @@ const TaskDetails: React.FC = () => {
           deadline: `${editedTask.deadline}T23:59:59`,
           status: editedTask.status,
           priority: editedTask.priority,
-          description: editedTask.description, // Added description
+          description: editedTask.description,
+          locked: editedTask.locked,
         };
         await updateTask(parseInt(editedTask.id), updateData);
         setTask(editedTask);
@@ -102,6 +106,31 @@ const TaskDetails: React.FC = () => {
     }
   };
 
+  const lockTaskApi = async (taskId: number, locked: boolean) => {
+    try {
+      const response = await TaskAPI.lockTask(taskId, locked);
+      console.log(response);
+      toast.success(`Task ${locked ? 'locked' : 'unlocked'} successfully`);
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to lock/unlock task.');
+      throw error;
+    }
+  };
+
+  const handleLock = async () => {
+    if (task) {
+      try {
+        await lockTaskApi(parseInt(task.id), !task.locked);
+        const updatedTask = { ...task, locked: !task.locked };
+        setTask(updatedTask);
+        setEditedTask(updatedTask);
+      } catch (error) {
+        console.error('Lock/Unlock error:', error);
+      }
+    }
+  };
+
   if (loading) return <Typography>Loading...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
   if (!task) return <Typography>Task not found.</Typography>;
@@ -114,6 +143,7 @@ const TaskDetails: React.FC = () => {
 
       {editMode ? (
         <>
+          {/* ... (input fields) */}
           <TextField label="Title" name="title" value={editedTask?.title || ''} onChange={handleInputChange} fullWidth margin="normal" />
           <TextField label="Assignee" name="assignee" value={editedTask?.assignee || ''} onChange={handleInputChange} fullWidth margin="normal" />
           <TextField label="Due Date" name="deadline" type="date" value={editedTask?.deadline || ''} onChange={handleInputChange} fullWidth margin="normal" InputLabelProps={{ shrink: true }} />
@@ -152,8 +182,11 @@ const TaskDetails: React.FC = () => {
           <Typography><strong>Description:</strong> {task.description}</Typography>
 
           <Box sx={{ mt: 2 }}>
-            <Button variant="contained" onClick={() => setEditMode(true)} sx={{ mr: 1 }}>Edit</Button>
-            <Button variant="outlined" color="error" onClick={handleDelete}>Delete</Button>
+            <Button variant="contained" onClick={() => setEditMode(true)} sx={{ mr: 1 }} disabled={task.locked} >Edit</Button>
+            <Button variant="outlined" color="error" onClick={handleDelete} disabled={task.locked} >Delete</Button>
+            <Button variant="contained" onClick={handleLock} sx={{ ml: 1 }}>
+              {task.locked ? 'Unlock Task' : 'Lock Task'}
+            </Button>
           </Box>
         </>
       )}

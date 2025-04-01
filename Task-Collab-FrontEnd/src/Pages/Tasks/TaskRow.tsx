@@ -55,20 +55,20 @@ const TaskRow: React.FC<TaskRowProps> = ({
     setEditedTask({ ...task });
   };
 
-    const handleLock = async () => {
-        if (!isAdmin) {
-            toast.error("You are not authorized to lock tasks.");
-            return;
-        }
+  const handleLock = async () => {
+    if (!isAdmin) {
+      toast.error('You are not authorized to lock tasks.');
+      return;
+    }
 
-        try {
-            await lockTaskApi(task.id, !task.locked); // Call the API
-            onLock(task.id); // Update the state
-        } catch (error) {
-            console.error("Failed to lock/unlock task:", error);
-            toast.error("Failed to lock/unlock task.");
-        }
-    };
+    try {
+      await lockTaskApi(task.id, !task.locked); // Call the API
+      onLock(task.id); // Update the state
+    } catch (error) {
+      console.error('Failed to lock/unlock task:', error);
+      toast.error('Failed to lock/unlock task.');
+    }
+  };
 
   return (
     <TableRow>
@@ -148,12 +148,16 @@ const TaskRow: React.FC<TaskRowProps> = ({
           </>
         ) : (
           <>
-            <IconButton onClick={() => setIsEditing(true)} color="primary">
-              <Edit />
-            </IconButton>
-            <IconButton onClick={() => onDelete(task.id)} color="secondary">
-              <Delete />
-            </IconButton>
+            {!task.locked && (
+              <>
+                <IconButton onClick={() => setIsEditing(true)} color="primary">
+                  <Edit />
+                </IconButton>
+                <IconButton onClick={() => onDelete(task.id)} color="secondary">
+                  <Delete />
+                </IconButton>
+              </>
+            )}
             {isAdmin && (
               <IconButton onClick={handleLock} color="default">
                 {task.locked ? <Lock /> : <LockOpen />}

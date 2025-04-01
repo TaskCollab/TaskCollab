@@ -55,15 +55,8 @@ const TasksTable: React.FC<TasksTableProps> = ({
         try{
           
             const response = await TaskAPI.lockTask(taskId, locked);
-            if (response.status === 200) {
-                toast.success(`Task ${locked ? 'locked' : 'unlocked'} successfully`);
-            } else {
-                toast.error(`Failed to ${locked ? 'lock' : 'unlock'} task`);
-            }
-
-            if (!response.ok) {
-                throw new Error('Failed to lock/unlock task');
-            }
+            console.log(response);
+            toast.success(`Task ${locked ? 'locked' : 'unlocked'} successfully`);
         }catch(error){
             console.error(error);
             throw error;
@@ -118,6 +111,7 @@ const TasksTable: React.FC<TasksTableProps> = ({
                     lockTaskApi={async (taskId: string, locked: boolean) => {
                       // Call the lockTaskApi function here
                       try {
+                        console.log(taskId, locked);
                         await lockTaskApi(parseInt(taskId), locked);
                         onLockTask(taskId); // Update the state
                       } catch (error) {

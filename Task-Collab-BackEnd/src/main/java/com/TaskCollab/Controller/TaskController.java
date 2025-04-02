@@ -97,7 +97,18 @@ public class TaskController {
                 .getSubject();
 
         List<TaskInterface> userTasks = taskService.getTasksByUsername(username);
+        
         List<TaskDTO> taskDTOs = userTasks.stream()
+                .map(task -> modelMapper.map(task, TaskDTO.class))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(taskDTOs);
+    }
+
+    @GetMapping("/all-tasks")
+    public ResponseEntity<List<TaskDTO>> getAllTasks() {
+        List<TaskInterface> allTasks = taskService.getAllTasks();
+        List<TaskDTO> taskDTOs = allTasks.stream()
                 .map(task -> modelMapper.map(task, TaskDTO.class))
                 .collect(Collectors.toList());
 

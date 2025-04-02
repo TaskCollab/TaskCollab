@@ -1,67 +1,33 @@
+// src/components/users/UsersTable.tsx
 import React from 'react';
-import {
-  Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Select, MenuItem,
-  Button
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import UserRow from './UserRow';
+import { UserDTO, RoleDTO } from '../../API/UsersAPICall'; // Ensure the file exists and matches the correct case-sensitive path
 
-interface User {
-  userId: string;
-  username: string;
-  role: string;
-  isAdmin: boolean;
-}
 
 interface UsersTableProps {
-  users: User[];
-  roles: string[];
+  users: UserDTO[];
+  roles: RoleDTO[];
   onUpdateRole: (userId: string, newRole: string) => void;
   onDelete: (userId: string) => void;
+  onEdit: (user: UserDTO) => void;
 }
 
-const UsersTable: React.FC<UsersTableProps> = ({ 
-  users, 
-  roles,
-  onUpdateRole,
-  onDelete 
-}) => {
+const UsersTable: React.FC<UsersTableProps> = ({ users, roles, onUpdateRole, onDelete, onEdit }) => {
   return (
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>Username</TableCell>
-            <TableCell>Update Role</TableCell>
+            <TableCell>Role</TableCell>
             <TableCell>Admin Status</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.map(user => (
-            <TableRow key={user.userId}>
-              <TableCell>{user.username}</TableCell>
-              <TableCell>
-                <Select
-                  value={user.role}
-                  onChange={(e) => onUpdateRole(user.userId, e.target.value)}
-                >
-                  {roles.map(role => (
-                    <MenuItem key={role} value={role}>
-                      {role}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </TableCell>
-              <TableCell>{user.isAdmin ? 'Yes' : 'No'}</TableCell>
-              <TableCell>
-                <Button 
-                  color="error"
-                  onClick={() => onDelete(user.userId)}
-                >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
+          {users.map((user) => (
+            <UserRow key={user.userId} user={user} roles={roles} onUpdateRole={onUpdateRole} onDelete={onDelete} onEdit={onEdit} />
           ))}
         </TableBody>
       </Table>

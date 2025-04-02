@@ -134,6 +134,16 @@ public boolean deleteTask(Long task_Id) {
         }).collect(Collectors.toList());
     }
 
+    public List<TaskInterface> getAllTasks() {
+        List<Task> tasks = taskRepository.findAll();
+        return tasks.stream().map(task -> {
+            TaskInterface decoratedTask = task;
+            decoratedTask = new LoggingTaskDecorator(decoratedTask);
+            decoratedTask = new ValidationTaskDecorator(decoratedTask);
+            return decoratedTask;
+        }).collect(Collectors.toList());
+    }
+
     @Transactional
     public String toggleLockStatus(Long taskId, boolean lock) {
         Optional<Task> taskOpt = taskRepository.findById(taskId);

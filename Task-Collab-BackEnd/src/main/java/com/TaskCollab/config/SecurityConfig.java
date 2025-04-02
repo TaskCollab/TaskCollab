@@ -16,6 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.TaskCollab.Entity.Users;
 import com.TaskCollab.Security.JwtAuthFilter;
 
 import com.TaskCollab.Service.UserService;
@@ -57,6 +58,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(); // Secure password hashing
     }
+
 
     // CORS Configuration
     @Bean

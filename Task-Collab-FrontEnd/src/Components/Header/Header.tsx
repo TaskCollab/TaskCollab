@@ -106,6 +106,16 @@ const Header: React.FC = () => {
     }
   };
 
+  const logout = async () => {
+    try {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('isAdmin');
+      navigate('/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   const handleTaskCreated = async (newTask: NewTask) => {
     try {
       const deadlineDate = new Date(newTask.deadline).toISOString();
@@ -133,6 +143,8 @@ const Header: React.FC = () => {
             <NotificationsIcon />
           </Badge>
         </IconButton>
+
+        <Button color="inherit" onClick={logout}>Logout</Button>
 
         {/* {isAdmin && (
           <Button color="inherit" component={Link} to="/users">Manage Users</Button>

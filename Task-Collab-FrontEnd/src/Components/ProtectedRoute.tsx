@@ -23,7 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireLogin 
     }
 
     // If a specific role is required, check if the user has that role
-    if (requiredRole && (!user || user.role !== requiredRole)) {
+    if (requiredRole && (!user)) {
         return <Navigate to="/not-authorized" replace />;
     }
 

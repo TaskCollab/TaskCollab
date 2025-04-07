@@ -47,11 +47,14 @@ CREATE TABLE Task (
    task_Id BIGINT IDENTITY(1000,1) NOT NULL PRIMARY KEY,
    task_Title NVARCHAR(255) NOT NULL,
    description NVARCHAR(MAX),
+   priority NVARCHAR(MAX) NOT NULL DEFAULT 'Low',
    assigned_To NVARCHAR(255) NULL,
    status NVARCHAR(50),
    deadline DATETIME,
    FOREIGN KEY (assigned_To) REFERENCES Users(username) ON DELETE SET NULL
 );
+
+ALTER TABLE Task ADD locked BIT NOT NULL DEFAULT 0;
 
 CREATE TABLE Conversation (
    conversationId BIGINT NOT NULL PRIMARY KEY,

@@ -8,9 +8,7 @@ import {
   TableRow,
   Paper,
   Typography,
-  IconButton,
 } from '@mui/material';
-import TaskRow from './TaskRow';
 import { useNavigate } from 'react-router-dom';
 
 interface Task {
@@ -25,21 +23,10 @@ interface Task {
 
 interface TasksTableProps {
   tasks: Task[];
-  isAdmin: boolean;
-  onUpdateTask: (updatedTask: Task) => void;
-  onDeleteTask: (taskId: string) => void;
-  onLockTask: (taskId: string) => void;
-  navigate: (path: string) => void; // Add navigate prop
+  navigate: (path: string) => void;
 }
 
-const TasksTable: React.FC<TasksTableProps> = ({
-  tasks,
-  isAdmin,
-  onUpdateTask,
-  onDeleteTask,
-  onLockTask,
-  navigate, // Destructure navigate prop
-}) => {
+const TasksTable: React.FC<TasksTableProps> = ({ tasks, navigate }) => {
   const isEmpty = tasks.length === 0;
 
   const handleTitleClick = (taskId: string) => {
@@ -56,13 +43,12 @@ const TasksTable: React.FC<TasksTableProps> = ({
             <TableCell sx={{ fontWeight: 'bold' }}>Due Date</TableCell>
             <TableCell sx={{ fontWeight: 'bold' }}>Priority</TableCell>
             <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {isEmpty ? (
             <TableRow>
-              <TableCell colSpan={6} align="center">
+              <TableCell colSpan={5} align="center">
                 <Typography variant="body2" color="text.secondary">
                   No tasks found
                 </Typography>
@@ -74,7 +60,7 @@ const TasksTable: React.FC<TasksTableProps> = ({
                 <TableCell>
                   <Typography
                     onClick={() => handleTitleClick(task.id)}
-                    style={{ cursor: 'pointer' }} // Add pointer cursor
+                    style={{ cursor: 'pointer' }}
                   >
                     {task.title}
                   </Typography>
@@ -83,15 +69,6 @@ const TasksTable: React.FC<TasksTableProps> = ({
                 <TableCell>{task.dueDate}</TableCell>
                 <TableCell>{task.priority}</TableCell>
                 <TableCell>{task.status}</TableCell>
-                <TableCell>
-                  <TaskRow
-                    task={task}
-                    isAdmin={isAdmin}
-                    onUpdate={onUpdateTask}
-                    onDelete={onDeleteTask}
-                    onLock={onLockTask}
-                  />
-                </TableCell>
               </TableRow>
             ))
           )}

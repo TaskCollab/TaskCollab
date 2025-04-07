@@ -40,4 +40,23 @@ public class ValidationTaskDecorator extends TaskDecorator {
         }
         super.setStatus(status);
     }
+
+    @Override
+    public String getPriority() {
+        // Implement validation logic here, or delegate.
+        if (super.getPriority() == null || super.getPriority().isEmpty()){
+            throw new IllegalArgumentException("Priority cannot be empty");
+        }
+
+        return super.getPriority();
+    }
+
+    @Override
+    public void setPriority(String priority) {
+        // Implement validation logic here, or delegate.
+        if (priority == null || priority.isEmpty()){
+            throw new IllegalArgumentException("Priority cannot be empty");
+        }
+        super.setPriority(priority);
+    }
 }

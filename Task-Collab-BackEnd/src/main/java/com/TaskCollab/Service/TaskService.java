@@ -3,10 +3,15 @@ package com.TaskCollab.Service;
 import com.TaskCollab.Decorator.LoggingTaskDecorator;
 import com.TaskCollab.Decorator.ValidationTaskDecorator;
 import com.TaskCollab.dto.TaskDTO;
+
+import jakarta.transaction.Transactional;
+
 import com.TaskCollab.Entity.Task;
 import com.TaskCollab.Entity.TaskInterface;
 import com.TaskCollab.dao.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,6 +47,8 @@ public class TaskService {
         task.setAssigned_To(taskDTO.getAssignedTo());
         task.setStatus(taskDTO.getStatus());
         task.setDeadline(taskDTO.getDeadline());
+        task.setPriority(taskDTO.getPriority());
+        task.setLocked(taskDTO.isLocked());
 
         Task savedTask = taskRepository.save(task);
 
@@ -64,6 +71,8 @@ public TaskInterface updateTask(Long taskId, TaskDTO taskDTO) {
         existingTask.setAssigned_To(taskDTO.getAssignedTo());
         existingTask.setStatus(taskDTO.getStatus());
         existingTask.setDeadline(taskDTO.getDeadline());
+        existingTask.setPriority(taskDTO.getPriority());
+        existingTask.setLocked(taskDTO.isLocked());
 
         Task updatedTask = taskRepository.save(existingTask);
 
@@ -123,5 +132,31 @@ public boolean deleteTask(Long task_Id) {
             decoratedTask = new ValidationTaskDecorator(decoratedTask);
             return decoratedTask;
         }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public String toggleLockStatus(Long taskId, boolean lock) {
+        Optional<Task> taskOpt = taskRepository.findById(taskId);
+        if (taskOpt.isEmpty()) {
+            throw new RuntimeException("Task not found.");
+        }
+
+        Task task = taskOpt.get();
+        if (!isAdmin()) {
+            throw new SecurityException("Only admins can lock or unlock tasks.");
+        }
+
+        task.setLocked(lock);
+        taskRepository.save(task);
+        return lock ? "Task has been locked successfully." : "Task has been unlocked successfully.";
+    }
+
+    private boolean isAdmin() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails userDetails) {
+            return userDetails.getAuthorities().stream()
+                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        }
+        return false;
     }
 }

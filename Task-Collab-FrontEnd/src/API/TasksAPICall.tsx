@@ -93,6 +93,16 @@ export const TaskAPI = {
   }
 },
 
+lockTask: async (taskId: number, locked: boolean) => {
+  try {
+    const response = await taskApiClient.put(`/lock/${taskId}?lock=${locked}`); // Corrected API call
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+    return null;
+  }
+},
+
   getTask: async (id: number) => {
     const response = await taskApiClient.get(`${id}`);
     return response.data;

@@ -30,6 +30,19 @@ public class Task implements TaskInterface {
     private String assigned_To;
     private String status;
     private LocalDateTime deadline;
+    @Column(name = "locked")
+    private boolean locked = false;
+
+    @Column(name = "priority")
+    private String priority;
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
 
 
     public String getTask_Title() {
@@ -70,5 +83,12 @@ public class Task implements TaskInterface {
 
     public void setDeadline(LocalDateTime deadline) {
         this.deadline = deadline;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }

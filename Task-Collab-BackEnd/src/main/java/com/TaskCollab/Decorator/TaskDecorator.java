@@ -21,6 +21,16 @@ public abstract class TaskDecorator implements TaskInterface {
     }
 
     @Override
+    public String getPriority() {
+        return decoratedTask.getPriority();
+    }
+
+    @Override  
+    public void setPriority(String priority) {
+        decoratedTask.setPriority(priority);
+    }
+
+    @Override
     public String getTask_Title() {
         return decoratedTask.getTask_Title();
     }
@@ -68,5 +78,15 @@ public abstract class TaskDecorator implements TaskInterface {
     @Override
     public void setDeadline(LocalDateTime deadline) {
         decoratedTask.setDeadline(deadline);
+    }
+
+    @Override
+    public boolean isLocked() {
+        return decoratedTask.isLocked();
+    }
+
+    @Override
+    public void setLocked(boolean locked) {
+        decoratedTask.setLocked(locked);
     }
 }

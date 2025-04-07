@@ -10,4 +10,6 @@ public class TaskDTO {
     private String assignedTo;
     private String status;
     private LocalDateTime deadline;
+    private String priority;
+    private boolean locked;
 }

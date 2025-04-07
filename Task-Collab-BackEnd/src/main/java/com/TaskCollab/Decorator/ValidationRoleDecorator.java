@@ -15,4 +15,6 @@ public class ValidationRoleDecorator extends RoleDecorator {
         }
         super.setRoleName(roleName);
     }
+
+  
 }

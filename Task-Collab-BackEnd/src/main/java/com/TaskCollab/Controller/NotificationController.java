@@ -2,8 +2,16 @@ package com.TaskCollab.Controller;
 
 import com.TaskCollab.Entity.Notification;
 import com.TaskCollab.Entity.NotificationInterface;
+import com.TaskCollab.Entity.Users;
 import com.TaskCollab.Service.NotificationService;
+import com.TaskCollab.Service.UserService;
+import com.TaskCollab.config.JwtProperties;
 import com.TaskCollab.dto.NotificationDTO;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
+
 import com.TaskCollab.dao.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +27,29 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @Autowired
+    private UserService userservice;
+
+    @Autowired
+    private JwtProperties jwtProperties;
+
+    @Autowired
     public NotificationController(NotificationRepository notificationRepository, NotificationService notificationService) {
         this.notificationRepository = notificationRepository;
         this.notificationService = notificationService;
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<NotificationDTO>> getNotificationsByUserId(@PathVariable Long userId) {
-        List<NotificationDTO> notifications = notificationService.getNotificationByUserId(userId);
+    @GetMapping("/user")
+    public ResponseEntity<List<NotificationDTO>> getNotificationsByUserId(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        String secret = jwtProperties.getSecret();
+        String username = Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+        Users userId = userservice.getUserByUsername(username);
+        List<NotificationDTO> notifications = notificationService.getNotificationByUserId(userId.getUserId());
         return ResponseEntity.ok(notifications);
     }
 

@@ -6,10 +6,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.TaskCollab.Entity.Role;
 import com.TaskCollab.Entity.Users;
+import com.TaskCollab.config.SecurityConfig;
 import com.TaskCollab.dao.RoleRepository;
 import com.TaskCollab.dao.UserRepository;
 
@@ -73,6 +76,10 @@ public class UserService implements UserDetailsService {
 
     // Create a new user (Stores raw password)
     public Users createUser(Users user) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String rawPassword = user.getPassword();
+        String hashedPassword = passwordEncoder.encode(rawPassword);
+        user.setPassword(hashedPassword); // Correctly set the hashed password
         return userRepository.save(user);
     }
 

@@ -44,7 +44,10 @@ public class AuthController {
             // Generate a JWT token
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String jwt = jwtUtils.generateToken(userDetails);
-            return ResponseEntity.ok(new LoginResponse(jwt));
+            // Check if the user is an admin
+            Boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_Admin"));
+            return ResponseEntity.ok(new LoginResponse(jwt, isAdmin));
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }

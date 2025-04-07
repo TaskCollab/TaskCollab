@@ -1,33 +1,23 @@
+// src/components/users/UserRow.tsx
 import React, { useState } from 'react';
 import { TableRow, TableCell, Select, MenuItem, IconButton, SelectChangeEvent, Modal, Box, Typography, Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-
-interface RoleType {
-  roleId: number;
-  roleName: string;
-}
-
-interface UserType {
-  userId: number;
-  username: string;
-  isAdmin?: boolean;
-  role: RoleType;
-}
+import { UserDTO, RoleDTO } from '../../API/UsersAPICall'; // Ensure the file exists and matches the correct case-sensitive path
 
 interface UserRowProps {
-  user: UserType;
-  roles: RoleType[];
-  onUpdateRole: (userId: number, newRoleId: number) => void;
-  onDelete: (userId: number) => void;
+  user: UserDTO;
+  roles: RoleDTO[];
+  onUpdateRole: (userId: string, newRole: string) => void;
+  onDelete: (userId: string) => void;
+  onEdit: (user: UserDTO) => void;
 }
 
-const UserRow: React.FC<UserRowProps> = ({ user, roles, onUpdateRole, onDelete }) => {
+const UserRow: React.FC<UserRowProps> = ({ user, roles, onUpdateRole, onDelete, onEdit }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
-  const handleRoleChange = (event: SelectChangeEvent<number>) => {
-    const newRoleId = Number(event.target.value);
-    onUpdateRole(user.userId, newRoleId);
+  const handleRoleChange = (event: SelectChangeEvent<string>) => {
+    onUpdateRole(user.userId, event.target.value);
   };
 
   const handleOpenModal = () => {
@@ -43,51 +33,27 @@ const UserRow: React.FC<UserRowProps> = ({ user, roles, onUpdateRole, onDelete }
       <TableRow hover key={user.userId}>
         <TableCell>{user.username}</TableCell>
         <TableCell>
-          <Select
-            value={user.role.roleId}
-            onChange={handleRoleChange}
-            size="small"
-          >
-            {roles.map(role => (
-              <MenuItem key={role.roleId} value={role.roleId}>
+          <Select value={user.role.roleName} onChange={handleRoleChange} size="small">
+            {roles.map((role) => (
+              <MenuItem key={role.roleId} value={role.roleName}>
                 {role.roleName}
               </MenuItem>
             ))}
           </Select>
         </TableCell>
+        <TableCell>{user.isAdmin ? 'Yes' : 'No'}</TableCell>
         <TableCell align="right">
-          <IconButton
-            aria-label="View User Details"
-            color="primary"
-            size="small"
-            onClick={handleOpenModal}
-          >
+          <IconButton aria-label="View User Details" color="primary" size="small" onClick={handleOpenModal}>
             <EditIcon />
           </IconButton>
-          <IconButton
-            aria-label="Delete User"
-            color="error"
-            size="small"
-            onClick={() => onDelete(user.userId)}
-          >
+          <IconButton aria-label="Delete User" color="error" size="small" onClick={() => onDelete(user.userId)}>
             <DeleteIcon />
           </IconButton>
         </TableCell>
       </TableRow>
 
       <Modal open={modalOpen} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4 }}>
           <Typography variant="h6" component="h2">
             User Details
           </Typography>
@@ -107,7 +73,7 @@ const UserRow: React.FC<UserRowProps> = ({ user, roles, onUpdateRole, onDelete }
             <Button onClick={handleCloseModal} sx={{ mr: 1 }}>
               Close
             </Button>
-            <Button variant="contained" color="primary">
+            <Button variant="contained" color="primary" onClick={() => onEdit(user)}>
               Edit
             </Button>
           </Box>

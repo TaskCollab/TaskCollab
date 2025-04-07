@@ -45,13 +45,17 @@ const Header: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const isAdmin = true;
+  const [isAdmin, setIsAdmin] = useState<boolean>(true);
 
   const fetchNotifications = async () => {
     try {
       const data = await NotificationAPI.getNotifications();
       setNotifications(data);
       setUnreadCount(data.filter((n: Notification) => !n.readStatus).length);
+      const adminStatus = localStorage.getItem('isAdmin');
+      const admin = adminStatus === 'false'; 
+      setIsAdmin(admin);
+      console.log(admin)
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }
@@ -130,9 +134,9 @@ const Header: React.FC = () => {
           </Badge>
         </IconButton>
 
-        {isAdmin && (
+        {/* {isAdmin && (
           <Button color="inherit" component={Link} to="/users">Manage Users</Button>
-        )}
+        )} */}
       </Toolbar>
 
 

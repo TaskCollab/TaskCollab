@@ -1,14 +1,16 @@
+// src/components/users/UserDetailsPage.tsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UsersAPI, UserDTO, RoleDTO } from '../../API/UsersAPICall';
 import { Button, Typography, Box, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+
 
 const UserDetailsPage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const [user, setUser] = useState<UserDTO | null>(null);
   const [editedUsername, setEditedUsername] = useState<string>('');
   const [editedRole, setEditedRole] = useState<string>('');
-  const [roles, setRoles] = useState<string[]>([]);
+  const [roles, setRoles] = useState<RoleDTO[]>([]);
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
@@ -19,10 +21,10 @@ const UserDetailsPage: React.FC = () => {
         const foundUser = users.find((u: UserDTO) => u.userId === userId);
         setUser(foundUser || null);
         setEditedUsername(foundUser?.username || '');
-        setEditedRole(foundUser?.role || '');
+        setEditedRole(foundUser?.role.roleName || '');
 
         const rolesData = await UsersAPI.getAllRoles();
-        setRoles(rolesData.map((r: RoleDTO) => r.roleName));
+        setRoles(rolesData);
       } catch (err) {
         setError('Failed to fetch user or roles.');
         console.error('Failed to fetch user or roles:', err);
@@ -47,7 +49,7 @@ const UserDetailsPage: React.FC = () => {
     try {
       if (user) {
         await UsersAPI.updateUserRole(user.userId, editedRole);
-        setUser({ ...user, username: editedUsername, role: editedRole });
+        setUser({ ...user, username: editedUsername, role: {roleName: editedRole, roleId: roles.find(role => role.roleName === editedRole)?.roleId || 0} });
         navigate('/users');
       }
     } catch (err) {
@@ -65,25 +67,13 @@ const UserDetailsPage: React.FC = () => {
       <Typography variant="h5" gutterBottom>
         User Details
       </Typography>
-      <TextField
-        label="Username"
-        value={editedUsername}
-        onChange={(e) => setEditedUsername(e.target.value)}
-        fullWidth
-        margin="normal"
-      />
+      <TextField label="Username" value={editedUsername} onChange={(e) => setEditedUsername(e.target.value)} fullWidth margin="normal" />
       <FormControl fullWidth margin="normal">
         <InputLabel id="role-select-label">Role</InputLabel>
-        <Select
-          labelId="role-select-label"
-          id="role-select"
-          value={editedRole}
-          label="Role"
-          onChange={(e) => setEditedRole(e.target.value)}
-        >
+        <Select labelId="role-select-label" id="role-select" value={editedRole} label="Role" onChange={(e) => setEditedRole(e.target.value)}>
           {roles.map((role) => (
-            <MenuItem key={role} value={role}>
-              {role}
+            <MenuItem key={role.roleId} value={role.roleName}>
+              {role.roleName}
             </MenuItem>
           ))}
         </Select>
@@ -96,11 +86,7 @@ const UserDetailsPage: React.FC = () => {
           Delete
         </Button>
       </Box>
-      {error && (
-        <Typography color="error" sx={{ mt: 2 }}>
-          {error}
-        </Typography>
-      )}
+      {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
     </Box>
   );
 };

@@ -108,8 +108,8 @@ INSERT INTO roles (role_Id, role_Name, create_permission, read_permission, delet
 -- Insert users
 INSERT INTO Users (username, password, role_Id, is_Admin) VALUES
 ('admin_user', '$2a$12$yygN6MmF18cFsczAoCBGruND1ox2ct9AhkLFgMuT/rrIl1A.n8LRO', 1, 1), 
-('manager_user', 'hashedpassword2', 2, 0),
-('employee_user', 'hashedpassword3', 3, 0);
+('manager_user', '$2a$12$22f0EDkdGUFqRTLof4Kr0u7rCHImNP2BBpajkXOgHo9HcHMU4.ZS6', 2, 0),
+('employee_user', '$2a$12$jDq161qGBqSiF8GSKpuzVefixp5qz7z4aNwTI97Bw0YeuB9LS18ee', 3, 0);
 
 -- Insert user roles (assuming users can have multiple roles)
 INSERT INTO user_roles (user_id, role_id) VALUES
@@ -152,3 +152,6 @@ INSERT INTO Eventlog (user_Id, logContent, eventTime) VALUES
 (101, 'Logged in from web portal', '2025-02-10 09:00:00'),
 (102, 'Updated documentation task status', '2025-02-10 12:45:00'),
 (103, 'Submitted feature update for review', '2025-02-11 09:25:00');
+
+
+

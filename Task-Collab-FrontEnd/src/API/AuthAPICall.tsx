@@ -4,7 +4,10 @@ import {AUTH_API_URL}  from '../Utils/Constants';
 export const login = async (username: string, password: string) => {
     try {
         const response = await axios.post(`${AUTH_API_URL}/login`, { username, password });
+        console.log(username, password);
         localStorage.setItem('authToken', response.data.token);
+        localStorage.setItem('isAdmin', response.data.isAdmin);
+        console.log('Login successful:', response.data);
         return response.data;
     } catch (error) {
         console.error('Error logging in:', error);

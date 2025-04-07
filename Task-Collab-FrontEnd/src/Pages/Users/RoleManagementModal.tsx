@@ -1,26 +1,17 @@
+// src/components/users/RoleManagementModal.tsx
 import React, { useState, useEffect } from 'react';
-import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, TextField, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Paper, Checkbox, FormControlLabel
-} from '@mui/material';
-import { UsersAPI } from '../../API/UsersAPICall';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox, FormControlLabel } from '@mui/material';
+import { UsersAPI, RoleDTO } from '../../API/UsersAPICall';
 
-interface Role {
-  roleName: string;
-  permissions: {
-    create: boolean;
-    read: boolean;
-    update: boolean;
-    delete: boolean;
-  };
-}
 
-const RoleManagementModal: React.FC<{ 
+interface RoleManagementModalProps {
   open: boolean;
   onClose: () => void;
-}> = ({ open, onClose }) => {
-  const [roles, setRoles] = useState<Role[]>([]);
+  onRolesUpdated: () => void;
+}
+
+const RoleManagementModal: React.FC<RoleManagementModalProps> = ({ open, onClose, onRolesUpdated }) => {
+  const [roles, setRoles] = useState<RoleDTO[]>([]);
   const [newRoleName, setNewRoleName] = useState('');
   const [newRolePermissions, setNewRolePermissions] = useState({
     createPermission: true,
@@ -38,7 +29,7 @@ const RoleManagementModal: React.FC<{
         console.error('Error fetching roles:', error);
       }
     };
-    if(open) fetchRoles();
+    if (open) fetchRoles();
   }, [open]);
 
   const handleCreateRole = async () => {
@@ -55,9 +46,12 @@ const RoleManagementModal: React.FC<{
       await UsersAPI.createRole(roleDTO);
 
       setNewRoleName('');
-      setNewRolePermissions({ createPermission: true, readPermission: true, updatePermission: true, deletePermission: true }); // Reset permissions
+      setNewRolePermissions({ createPermission: true, readPermission: true, updatePermission: true, deletePermission: true });
       const updatedRoles = await UsersAPI.getAllRoles();
       setRoles(updatedRoles);
+      if (onRolesUpdated) {
+        onRolesUpdated();
+      }
     } catch (error) {
       console.error('Error creating role:', error);
     }
@@ -68,29 +62,12 @@ const RoleManagementModal: React.FC<{
       <DialogTitle>Role Management</DialogTitle>
       <DialogContent>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-          <TextField
-            label="New Role Name"
-            value={newRoleName}
-            onChange={(e) => setNewRoleName(e.target.value)}
-            fullWidth
-          />
+          <TextField label="New Role Name" value={newRoleName} onChange={(e) => setNewRoleName(e.target.value)} fullWidth />
           <div>
-            <FormControlLabel
-              control={<Checkbox checked={newRolePermissions.createPermission} onChange={(e) => setNewRolePermissions({ ...newRolePermissions, createPermission: e.target.checked })} />}
-              label="Create"
-            />
-            <FormControlLabel
-              control={<Checkbox checked={newRolePermissions.readPermission} onChange={(e) => setNewRolePermissions({ ...newRolePermissions, readPermission: e.target.checked })} />}
-              label="Read"
-            />
-            <FormControlLabel
-              control={<Checkbox checked={newRolePermissions.updatePermission} onChange={(e) => setNewRolePermissions({ ...newRolePermissions, updatePermission: e.target.checked })} />}
-              label="Update"
-            />
-            <FormControlLabel
-              control={<Checkbox checked={newRolePermissions.deletePermission} onChange={(e) => setNewRolePermissions({ ...newRolePermissions, deletePermission: e.target.checked })} />}
-              label="Delete"
-            />
+            <FormControlLabel control={<Checkbox checked={newRolePermissions.createPermission} onChange={(e) => setNewRolePermissions({ ...newRolePermissions, createPermission: e.target.checked })} />} label="Create" />
+            <FormControlLabel control={<Checkbox checked={newRolePermissions.readPermission} onChange={(e) => setNewRolePermissions({ ...newRolePermissions, readPermission: e.target.checked })} />} label="Read" />
+            <FormControlLabel control={<Checkbox checked={newRolePermissions.updatePermission} onChange={(e) => setNewRolePermissions({ ...newRolePermissions, updatePermission: e.target.checked })} />} label="Update" />
+            <FormControlLabel control={<Checkbox checked={newRolePermissions.deletePermission} onChange={(e) => setNewRolePermissions({ ...newRolePermissions, deletePermission: e.target.checked })} />} label="Delete" />
           </div>
           <Button variant="contained" onClick={handleCreateRole}>
             Create Role
@@ -111,18 +88,13 @@ const RoleManagementModal: React.FC<{
                 <TableRow key={role.roleName}>
                   <TableCell>{role.roleName}</TableCell>
                   <TableCell>
-                    {role.permissions && Object.entries(role.permissions)
-                      .filter(([_, value]) => value)
-                      .map(([perm]) => perm).join(', ')}
+                    {role.createPermission && 'Create'} {role.readPermission && 'Read'} {role.updatePermission && 'Update'} {role.deletePermission && 'Delete'}
                   </TableCell>
                   <TableCell>
-                    <Button 
-                      color="error" 
-                      onClick={async () => {
-                        await UsersAPI.deleteRole(role.roleName);
-                        setRoles(prev => prev.filter(r => r.roleName !== role.roleName));
-                      }}
-                    >
+                    <Button color="error" onClick={async () => {
+                      await UsersAPI.deleteRole(role.roleName);
+                      setRoles((prev) => prev.filter((r) => r.roleName !== role.roleName));
+                    }}>
                       Delete
                     </Button>
                   </TableCell>

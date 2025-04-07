@@ -41,6 +41,11 @@ export const TaskAPI = {
     return response.data;
   },
 
+  getAllTasks: async () => {
+    const response = await taskApiClient.get("/all-tasks");
+    return response.data;
+  },
+
    async searchTasks(criteria: TaskSearchCriteria): Promise<any[]> { //TODO: FIX THIS API CALL
     // Ensure deadline is formatted correctly if provided, or omit if null/undefined
     const body: any = {};
